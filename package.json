@@ -1,6 +1,6 @@
 {
   "name": "thecrownsk-bot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TheCrownSK - Autonomous AI Trading Bot for Monad blockchain with nad.fun integration",
   "type": "module",
   "main": "dist/index.js",
