@@ -1,0 +1,48 @@
+services:
+  agent:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONAD_RPC_URL=${MONAD_RPC_URL}
+      - MONAD_RPC_URL_BACKUP=${MONAD_RPC_URL_BACKUP}
+      - AGENT_PRIVATE_KEY=${AGENT_PRIVATE_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4-turbo-preview}
+      - TWITTER_API_KEY=${TWITTER_API_KEY}
+      - TWITTER_API_SECRET=${TWITTER_API_SECRET}
+      - TWITTER_ACCESS_TOKEN=${TWITTER_ACCESS_TOKEN}
+      - TWITTER_ACCESS_TOKEN_SECRET=${TWITTER_ACCESS_TOKEN_SECRET}
+      - TWITTER_ENABLE_POST=${TWITTER_ENABLE_POST:-false}
+      - TWITTER_DRY_RUN=${TWITTER_DRY_RUN:-true}
+      - REDIS_URL=${REDIS_URL}
+      - AGENT_NAME=${AGENT_NAME:-MonadTrader}
+      - MAX_SINGLE_TX_MON=${MAX_SINGLE_TX_MON:-0.1}
+      - DAILY_LIMIT_MON=${DAILY_LIMIT_MON:-1.0}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - ./logs:/app/logs
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  redis_data:
