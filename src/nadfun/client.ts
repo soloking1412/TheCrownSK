@@ -260,12 +260,21 @@ export async function buyTokens(params: BuyParams): Promise<TradeResult> {
         },
       ],
       value: monAmount,
-      gas: 300_000n,
+      gas: 500_000n, // Increased for DEX swaps
       gasPrice,
     });
 
     logger.info(`Buy tx submitted: ${hash}`);
     const receipt = await waitForTransaction(hash);
+
+    if (receipt.status === 'reverted') {
+      logger.error(`Buy transaction reverted`, { txHash: hash });
+      return {
+        success: false,
+        txHash: hash,
+        error: `Transaction reverted. Check tx: https://monadexplorer.com/tx/${hash}`,
+      };
+    }
 
     return {
       success: receipt.status === 'success',
@@ -277,7 +286,7 @@ export async function buyTokens(params: BuyParams): Promise<TradeResult> {
     logger.error(`Buy failed: ${errorMessage}`);
     return {
       success: false,
-      error: errorMessage,
+      error: errorMessage || 'Unknown error occurred',
     };
   }
 }
@@ -342,12 +351,21 @@ export async function sellTokens(params: SellParams): Promise<TradeResult> {
           deadline,
         },
       ],
-      gas: 300_000n,
+      gas: 500_000n, // Increased for DEX swaps
       gasPrice,
     });
 
     logger.info(`Sell tx submitted: ${hash}`);
     const receipt = await waitForTransaction(hash);
+
+    if (receipt.status === 'reverted') {
+      logger.error(`Sell transaction reverted`, { txHash: hash });
+      return {
+        success: false,
+        txHash: hash,
+        error: `Transaction reverted. Check tx: https://monadexplorer.com/tx/${hash}`,
+      };
+    }
 
     return {
       success: receipt.status === 'success',
@@ -359,7 +377,7 @@ export async function sellTokens(params: SellParams): Promise<TradeResult> {
     logger.error(`Sell failed: ${errorMessage}`);
     return {
       success: false,
-      error: errorMessage,
+      error: errorMessage || 'Unknown error occurred',
     };
   }
 }

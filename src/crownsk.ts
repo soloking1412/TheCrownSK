@@ -762,9 +762,8 @@ class TheCrownSKCLI {
   private askSecret(question: string): Promise<string> {
     return new Promise((resolve) => {
       // Note: In a real implementation, you'd want to hide input
-      // For now, we use standard prompt with a warning
-      process.stdout.write(question);
-      this.rl.question('', (answer) => {
+      // For now, we use standard prompt
+      this.rl.question(question, (answer) => {
         resolve(answer || '');
       });
     });
